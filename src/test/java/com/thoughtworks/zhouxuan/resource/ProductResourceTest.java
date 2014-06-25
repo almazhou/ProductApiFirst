@@ -105,4 +105,16 @@ public class ProductResourceTest extends JerseyTest {
         assertTrue(list.get("uri").toString().contains("/products/1"));
 
     }
+
+    @Test
+    public void should_get_404_when_specific_product_not_fond() throws Exception {
+        when(mockProductRepository.getProductById(1)).thenThrow(ProductNotFoundException.class);
+
+        Response response = target("/products/1").request().get();
+
+        assertThat(response.getStatus(),is(404));
+
+    }
+
+
 }
