@@ -12,14 +12,19 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -64,4 +69,20 @@ public class ProductResourceTest extends JerseyTest {
         assertThat(response.getStatus(),is(404));
 
     }
+
+    @Test
+    public void should_return_201_when_post_all_products_successfull() throws Exception {
+        when(mockProductRepository.saveProduct(anyObject())).thenReturn(1);
+        Map<String, String> input = new HashMap<>();
+        input.put("name","product1");
+
+        Response response = target("/products").request().post(Entity.entity(input, MediaType.APPLICATION_JSON));
+
+        assertThat(response.getStatus(),is(201));
+
+        assertTrue(response.getHeaderString("location").contains("/products/1"));
+
+    }
+
+
 }
