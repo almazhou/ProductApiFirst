@@ -4,6 +4,8 @@ import com.thoughtworks.zhouxuan.domain.Pricing;
 import com.thoughtworks.zhouxuan.domain.PricingBuilder;
 import com.thoughtworks.zhouxuan.domain.Product;
 import com.thoughtworks.zhouxuan.domain.ProductBuilder;
+import com.thoughtworks.zhouxuan.exception.PricingNotFoundException;
+import com.thoughtworks.zhouxuan.exception.PricingNotFoundExceptionMapper;
 import com.thoughtworks.zhouxuan.exception.ProductNotFoundException;
 import com.thoughtworks.zhouxuan.exception.ProductNotFoundExceptionMapper;
 import com.thoughtworks.zhouxuan.repository.ProductRepository;
@@ -29,6 +31,7 @@ import java.util.Map;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -47,7 +50,7 @@ public class ProductResourceTest extends JerseyTest {
             }
         };
 
-        return new ResourceConfig().register(binder).register(ProductResource.class).register(ProductNotFoundExceptionMapper.class).register(PricingResource.class);
+        return new ResourceConfig().register(binder).register(ProductResource.class).register(ProductNotFoundExceptionMapper.class).register(PricingNotFoundExceptionMapper.class).register(PricingResource.class);
     }
 
 
@@ -139,9 +142,33 @@ public class ProductResourceTest extends JerseyTest {
 
         assertThat(price.get("amount"), Is.<Object>is(44.00));
         assertThat(price.get("productId"), Is.<Object>is(1));
-        assertThat(((String)price.get("uri")).contains("/products/1/pricings/1"),is(true));
+        assertThat(((String) price.get("uri")).contains("/products/1/pricings/1"), is(true));
     }
 
+    @Test
+    public void should_return_404_when_price_not_found() throws Exception {
+        when(mockProductRepository.getProductById(1)).thenReturn(product11);
+        when(mockProductRepository.getAllPricingsOfProduct(1)).thenThrow(PricingNotFoundException.class);
 
+        Response response = target("/products/1/pricings").request().get();
+
+        assertThat(response.getStatus(), is(404));
+
+    }
+
+    @Test
+    public void should_return_201_when_post_one_pricing() throws Exception {
+        Map<String, String> input = new HashMap();
+        input.put("amount", "20.00");
+        when(mockProductRepository.getProductById(1)).thenReturn(product11);
+        when(mockProductRepository.savePricing(anyObject(),anyObject())).thenReturn(1);
+
+        Response response = target("/products/1/pricings").request().post(Entity.entity(input, MediaType.APPLICATION_JSON));
+
+        assertThat(response.getStatus(), is(201));
+
+        assertTrue(response.getHeaderString("location").contains("/products/1/pricings/1"));
+
+    }
 }
 
