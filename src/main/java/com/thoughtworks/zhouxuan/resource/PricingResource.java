@@ -2,17 +2,11 @@ package com.thoughtworks.zhouxuan.resource;
 
 import com.thoughtworks.zhouxuan.domain.Pricing;
 import com.thoughtworks.zhouxuan.domain.Product;
-import com.thoughtworks.zhouxuan.json.PricingInputJson;
 import com.thoughtworks.zhouxuan.json.PricingJson;
 import com.thoughtworks.zhouxuan.repository.ProductRepository;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,10 +33,11 @@ public class PricingResource {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createPricing(PricingInputJson pricingInputJson) {
-        int priceId = productRepository.savePricing(product, pricingInputJson);
-        String uri = uriInfo.getBaseUri() + "products/" + String.valueOf(product.getId()) + "/pricings/" + String.valueOf(priceId);
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response createPricing(Form form) {
+        Pricing pricing = new Pricing(Double.valueOf(form.asMap().getFirst("amount")));
+        productRepository.savePricing(product, pricing);
+        String uri = uriInfo.getBaseUri() + "products/" + String.valueOf(product.getId()) + "/pricings/" + String.valueOf(new Pricing(Double.valueOf(form.asMap().getFirst("amount"))).getId());
         return Response.created(URI.create(uri)).build();
     }
 }

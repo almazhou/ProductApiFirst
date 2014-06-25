@@ -2,19 +2,17 @@ package com.thoughtworks.zhouxuan.repository;
 
 import com.thoughtworks.zhouxuan.domain.Pricing;
 import com.thoughtworks.zhouxuan.domain.Product;
-import com.thoughtworks.zhouxuan.json.PricingInputJson;
-import com.thoughtworks.zhouxuan.json.ProductInputJson;
 
 import java.util.List;
 
 public interface ProductRepository {
     public List<Product> getAllProducts();
 
-    int saveProduct(ProductInputJson productInputJson);
+    void saveProduct(Product product);
 
     Product getProductById(int id);
 
     List<Pricing> getAllPricingsOfProduct(int productid);
 
-    int savePricing(Product product, PricingInputJson pricingInputJson);
+    void savePricing(Product product, Pricing pricingInputJson);
 }
