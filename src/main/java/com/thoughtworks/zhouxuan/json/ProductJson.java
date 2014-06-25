@@ -16,4 +16,8 @@ public class ProductJson {
     public String getName(){
         return product.getName();
     }
+
+    public String getUri(){
+        return uriInfo.getBaseUri()+"products/"+String.valueOf(product.getId());
+    }
 }

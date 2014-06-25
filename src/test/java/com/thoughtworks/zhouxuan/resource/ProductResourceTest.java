@@ -1,6 +1,7 @@
 package com.thoughtworks.zhouxuan.resource;
 
 import com.thoughtworks.zhouxuan.domain.Product;
+import com.thoughtworks.zhouxuan.domain.ProductBuilder;
 import com.thoughtworks.zhouxuan.exception.ProductNotFoundException;
 import com.thoughtworks.zhouxuan.exception.ProductNotFoundExceptionMapper;
 import com.thoughtworks.zhouxuan.repository.ProductRepository;
@@ -45,7 +46,9 @@ public class ProductResourceTest extends JerseyTest {
 
     @Test
     public void should_return_200_when_get_all_products_success() throws Exception {
-        when(mockProductRepository.getAllProducts()).thenReturn(Arrays.asList(new Product("product1"),new Product("product2")));
+        Product product11 = new ProductBuilder().setId(1).setName("product1").build();
+        Product product21 = new ProductBuilder().setId(2).setName("product2").build();
+        when(mockProductRepository.getAllProducts()).thenReturn(Arrays.asList(product11, product21));
 
         Response response = target("/products").request().get();
 
@@ -58,6 +61,8 @@ public class ProductResourceTest extends JerseyTest {
 
         assertThat(product1.get("name"),is("product1"));
         assertThat(product2.get("name"),is("product2"));
+        assertTrue(product1.get("uri").toString().contains("/products/1"));
+        assertTrue(product2.get("uri").toString().contains("/products/2"));
     }
 
     @Test
