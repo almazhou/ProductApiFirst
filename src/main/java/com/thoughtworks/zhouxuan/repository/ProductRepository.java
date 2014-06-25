@@ -9,4 +9,6 @@ public interface ProductRepository {
     public List<Product> getAllProducts();
 
     int saveProduct(ProductInputJson productInputJson);
+
+    Product getProductById(int id);
 }

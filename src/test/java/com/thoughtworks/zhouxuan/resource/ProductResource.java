@@ -1,5 +1,6 @@
 package com.thoughtworks.zhouxuan.resource;
 
+import com.thoughtworks.zhouxuan.domain.Product;
 import com.thoughtworks.zhouxuan.json.ProductInputJson;
 import com.thoughtworks.zhouxuan.json.ProductJson;
 import com.thoughtworks.zhouxuan.repository.ProductRepository;
@@ -32,5 +33,14 @@ public class ProductResource {
         int id = productRepository.saveProduct(productInputJson);
 
         return Response.created(URI.create(uriInfo.getBaseUri()+"/products/"+String.valueOf(id))).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{id}")
+    public ProductJson getProductById(@Context UriInfo uriInfo, @PathParam("id") int id){
+        Product productById = productRepository.getProductById(id);
+        return new ProductJson(productById,uriInfo);
+
     }
 }
